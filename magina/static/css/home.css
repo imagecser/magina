@@ -1,0 +1,12 @@
+.label-badge {
+    font-size: 20px;
+    min-height: 36px;
+    letter-spacing: 3px;
+
+}
+.close-badge {
+    font-size: 16px;
+    margin-left: -4px;
+    margin-right: 20px;
+    cursor: pointer;
+}

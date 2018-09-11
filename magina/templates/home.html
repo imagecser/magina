@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block head %}
+    {{ super() }}
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}"/>
+    <script>
+        function deleteNode(node) {
+            $.ajax({
+                url: "/keyword/" + $(node).prev().text().toString(),
+                method: "DELETE",
+                content: document.body,
+                success: function () {
+                    $(node).parent().remove();
+                },
+                error: function (data, type, err) {
+                    alert("delete fail");
+                    console.log(err);
+                }
+            });
+        }
+    </script>
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <h3>Choose Your keyword</h3>
+        <div class="offset-2 col-8 my-1">
+            {% include 'flash_message.html' %}
+        </div>
+        <div class="input-group">
+            <a class="btn-add">
+                <span class="one"></span>
+                <span class="two"></span>
+            </a>
+            {% for idx, word in enumerate_words -%}
+                <div class="my-2">
+                    <span class="badge badge-pill label-badge {{ [
+                    'badge-primary', 'badge-secondary', 'badge-success', 'badge-danger', 'badge-warning',
+                     'badge-info'] | random }}">{{ word }}</span>
+                    <a class="badge badge-pill badge-light close-badge" onclick="deleteNode(this)">X</a>
+                </div>
+            {%- endfor %}
+        </div>
+    </div>
+{% endblock %}
