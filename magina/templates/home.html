@@ -1,43 +1,81 @@
 {% extends 'base.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
 {% block head %}
     {{ super() }}
     <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}"/>
+{% endblock %}
+{% block content %}
+    <div class="container" style="background-color: #fcfcfc; padding-top: 20px; padding-bottom: 20px;">
+        <div class="offset-2 col-8 my-1">
+            <h3>
+                {% block title %}
+                    Keyword
+                {% endblock %}
+            </h3>
+            {% include 'flash_message.html' %}
+            {% for field, errors in keyword_form.errors.items() %}
+                {% for error in errors %}
+                    <div class="alert alert-warning">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        {{ keyword_form[field].label.text + ': ' + error }}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+            <div class="dropdown-divider"></div>
+            <div class="col-6">
+                {#                {{ wtf.quick_form(keyword_form) }}#}
+                <form class="form" action="javascript:postNode()">
+                    {{ keyword_form.hidden_tag() }}
+                    {{ wtf.form_field(keyword_form.keyword) }}
+                    {{ wtf.form_field(keyword_form.submit) }}
+                </form>
+            </div>
+            <div class="input-group" style="padding-top: 64px">
+                {% for idx, word in enumerate_words -%}
+                    <div class="my-2">
+                    <span class="badge badge-pill label-badge {{ [
+                    'badge-primary', 'badge-secondary', 'badge-success', 'badge-danger', 'badge-warning',
+                     'badge-info'] | random }}">{{ word }}</span>
+                        <a class="badge badge-pill badge-light close-badge" onclick="deleteNode(this)">X</a>
+                    </div>
+                {%- endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+    {{ super() }}
     <script>
+        const badgeStyle = ['badge-primary', 'badge-secondary', 'badge-success', 'badge-danger',
+            'badge-warning', 'badge-info'];
+
         function deleteNode(node) {
             $.ajax({
                 url: "/keyword/" + $(node).prev().text().toString(),
                 method: "DELETE",
-                content: document.body,
                 success: function () {
                     $(node).parent().remove();
-                },
-                error: function (data, type, err) {
-                    alert("delete fail");
-                    console.log(err);
                 }
             });
         }
+
+        function postNode() {
+            const word = $("form div input").val();
+            $.ajax({
+                url: "/keyword/" + word,
+                method: "POST",
+                success: function (data) {
+                    if (data === "err") {
+                    } else {
+                        let $node = $(".input-group div:eq(0)").clone(true);
+                        $node.children('span').removeClass(function () {
+                            return $(this).attr("class");
+                        }).addClass("badge badge-pill label-badge").addClass(badgeStyle[Math.floor(Math.random() * badgeStyle.length)]);
+                        $(".input-group").append($node);
+                        $node.children('span').text(word);
+                    }
+                }
+            })
+        }
     </script>
-{% endblock %}
-{% block content %}
-    <div class="container">
-        <h3>Choose Your keyword</h3>
-        <div class="offset-2 col-8 my-1">
-            {% include 'flash_message.html' %}
-        </div>
-        <div class="input-group">
-            <a class="btn-add">
-                <span class="one"></span>
-                <span class="two"></span>
-            </a>
-            {% for idx, word in enumerate_words -%}
-                <div class="my-2">
-                    <span class="badge badge-pill label-badge {{ [
-                    'badge-primary', 'badge-secondary', 'badge-success', 'badge-danger', 'badge-warning',
-                     'badge-info'] | random }}">{{ word }}</span>
-                    <a class="badge badge-pill badge-light close-badge" onclick="deleteNode(this)">X</a>
-                </div>
-            {%- endfor %}
-        </div>
-    </div>
 {% endblock %}

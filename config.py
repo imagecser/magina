@@ -15,6 +15,7 @@ class Config:
 class DevelopmentConfig(Config):
     # TEMPLATES_AUTO_RELOAD = True
     DEBUG = True
+    SQLALCHEMY_ECHO = True
     SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:root@localhost/magina?charset=utf8"
     SQLALCHEMY_TRACK_MODIFICATIONS = True
 

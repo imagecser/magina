@@ -3,12 +3,11 @@
 {% block content %}
     <div class="container" style="background-color: #fcfcfc; padding-top: 20px; padding-bottom: 20px;">
         <div class="offset-2 col-8 my-3">
-            <h3>
+            <h3 style="padding-bottom: 24px">
                 {% block title %}
                     Login
                 {% endblock %}
             </h3>
-            <a href="{{ url_for('default.signup') }}">Signup</a>
             <div class="dropdown-divider"></div>
             {% include 'flash_message.html' %}
             {% for field, errors in login_form.errors.items() %}
@@ -20,6 +19,12 @@
                 {% endfor %}
             {% endfor %}
             {{ wtf.quick_form(login_form) }}
+            <div class="dropdown-divider" style="margin-top: 16px"></div>
+            <div class="row justify-content-sm-between">
+                <a href="{{ url_for('default.signup') }}"
+                   class="btn btn-outline-success btn-sm col-2" role="button">Signup</a>
+                <a href="#" class="btn btn-outline-danger btn-sm col-3" role="button">Forget password?</a>
+            </div>
         </div>
     </div>
 {% endblock %}

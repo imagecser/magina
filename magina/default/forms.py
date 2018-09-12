@@ -17,3 +17,8 @@ class SignupForm(FlaskForm):
     confirm_password = PasswordField('Repeat password',
                                      validators=[DataRequired(), EqualTo('password', message='Password must match')])
     submit = SubmitField('Signup')
+
+
+class KeywordForm(FlaskForm):
+    keyword = StringField('', validators=[DataRequired()])
+    submit = SubmitField('Add new keyword')
