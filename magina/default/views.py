@@ -1,12 +1,16 @@
+import random
+import string
 from datetime import timedelta
 from functools import wraps
 
 from flask import render_template, request, current_app, redirect, flash, url_for
 from flask_login import login_required, login_user, current_user, logout_user
+from flask_mail import Message
 
 from . import blueprint
 from .forms import LoginForm, SignupForm, KeywordForm
-from ..models import User, db
+from .. import mail, db
+from ..models import User, EmailActive
 
 
 def anonymous_required(func):
@@ -14,7 +18,7 @@ def anonymous_required(func):
     def decorated_view(*args, **kwargs):
         if current_user.is_authenticated:
             flash('You have logged-in.')
-            return redirect(url_for('default.index', is_login=False))
+            return redirect(url_for('default.index'))
         else:
             return func(*args, **kwargs)
 
@@ -48,6 +52,8 @@ def login():
         user = User.query.filter_by(email=login_form.email.data, password=login_form.password.data).first()
         if user is None:
             flash('Login failed.')
+        elif not user.email_active.is_active:
+            flash('Your account has not been activated.')
         else:
             login_user(user, remember=login_form.remember_me.data, duration=timedelta(hours=2))
             if next_page is not None:
@@ -61,22 +67,36 @@ def login():
 @anonymous_required
 def signup():
     signup_form = SignupForm()
-    if signup_form.validate_on_submit():
+    on_active = False
+    if signup_form.is_submitted():
+        current_app.logger.info(signup_form.email.data)
         email = signup_form.email.data
         username = signup_form.username.data
         password = signup_form.password.data
 
         current_app.logger.info('signup: %s %s %s' % (email, username, password))
-        if User.query.filter_by(email=signup_form.email.data).first() is None:
+        if User.query.filter_by(email=email).first() is None:
             # noinspection PyArgumentList
             user = User(email=email, username=username, password=password)
             db.session.add(user)
+            db.session.flush()
+            user_id = user.id
+            active_code = ''.join(random.choices(string.ascii_letters + string.digits, k=24))
+            email_active = EmailActive(user_id=user_id, is_active=False,
+                                       active_code=active_code)
+            db.session.add(email_active)
             db.session.commit()
-            flash('You have registered.')
-            return redirect(url_for('default.login'))
+            message = Message(
+                subject='Activate Your E-mail#%s' % ''.join(random.choices(string.ascii_letters, k=3)),
+                body='Your activate link: %s' % '%s%s?id=%s&code=%s' % (
+                    current_app.config['SERVER_DOMAIN_NAME'], url_for('default.activate'), user_id, active_code),
+                recipients=[email]
+            )
+            mail.send(message=message)
+            on_active = True
         else:
             flash('E-mail has been registered.')
-    return render_template('signup.html', signup_form=signup_form)
+    return render_template('signup.html', signup_form=signup_form, on_active=on_active)
 
 
 @blueprint.route('/keyword/<string:word>', methods=['DELETE', 'POST'])
@@ -87,11 +107,32 @@ def remove_keyword(word):
         return ''
     elif request.method == 'POST':
         current_app.logger.info("post %s" % word)
-        if word in [keyword.word for keyword in current_user.keywords]:
+        if not current_user.save_keyword(word):
             return 'err'
         else:
-            current_user.save_keyword(word)
             return ''
+
+
+@blueprint.route('/activate/')
+@anonymous_required
+def activate():
+    user_id = request.args.get('id')
+    active_code = request.args.get('code')
+    if user_id is None or active_code is None:
+        flash('Invalid url.')
+    else:
+        email_active_row: EmailActive = EmailActive.query.filter_by(user_id=user_id, active_code=active_code).first()
+        if email_active_row is None:
+            flash('Url not matches.')
+        elif email_active_row.is_active:
+            flash('Account has been activated before.')
+        else:
+            email_active_row.is_active = True
+            email_active_row.user.save_keyword('通知')
+            db.session.commit()
+            flash('You have active your account: %s' % email_active_row.user.email)
+
+    return render_template('active.html')
 
 
 @blueprint.route('/logout/')

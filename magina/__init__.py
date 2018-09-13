@@ -2,9 +2,11 @@ from flask import Flask
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
+from flask_mail import Mail
 
 from config import config
 
+mail = Mail()
 db = SQLAlchemy()
 bootstrap = Bootstrap()
 login_manager = LoginManager()
@@ -19,6 +21,7 @@ def create_app(config_name: str):
     config[config_name].init_app(app)
 
     db.init_app(app)
+    mail.init_app(app)
     bootstrap.init_app(app)
     login_manager.init_app(app)
     login_manager.login_view = 'default.login'

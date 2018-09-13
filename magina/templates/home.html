@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 {% import 'bootstrap/wtf.html' as wtf %}
-{% block head %}
+{% block styles %}
     {{ super() }}
     <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}"/>
 {% endblock %}
 {% block content %}
     <div class="container" style="background-color: #fcfcfc; padding-top: 20px; padding-bottom: 20px;">
-        <div class="offset-2 col-8 my-1">
+        <div class="offset-1 col-10 my-1">
             <h3>
                 {% block title %}
                     Keyword
@@ -22,15 +22,44 @@
                 {% endfor %}
             {% endfor %}
             <div class="dropdown-divider"></div>
-            <div class="col-6">
-                {#                {{ wtf.quick_form(keyword_form) }}#}
-                <form class="form" action="javascript:postNode()">
-                    {{ keyword_form.hidden_tag() }}
-                    {{ wtf.form_field(keyword_form.keyword) }}
-                    {{ wtf.form_field(keyword_form.submit) }}
-                </form>
+            {#                {{ wtf.quick_form(keyword_form) }}#}
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-10 col-lg-12">
+                    <form action="javascript:postNode()">
+                        <div class="card-body row no-gutters align-items-center">
+                            {{ keyword_form.hidden_tag() }}
+                            <div class="col">
+                                <input class="form-control form-control-borderless" type="text"
+                                       id="keyword" name="keyword" placeholder="Keyword">
+                            </div>
+                            <!--end of col-->
+                            <div class="col-auto">
+                                <input class="btn btn-success" id="submit" name="submit" type="submit" value="New">
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="input-group" style="padding-top: 64px">
+            <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalLabel">Warning</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            You cannot delete the last keyword.
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="input-group" style="padding-top: 32px">
                 {% for idx, word in enumerate_words -%}
                     <div class="my-2">
                     <span class="badge badge-pill label-badge {{ [
@@ -45,11 +74,17 @@
 {% endblock %}
 {% block scripts %}
     {{ super() }}
+    <!--suppress JSValidateTypes -->
     <script>
         const badgeStyle = ['badge-primary', 'badge-secondary', 'badge-success', 'badge-danger',
             'badge-warning', 'badge-info'];
 
         function deleteNode(node) {
+            const len = $(".input-group").children().length;
+            if (len === 1) {
+                $("#modal").modal('show');
+                return;
+            }
             $.ajax({
                 url: "/keyword/" + $(node).prev().text().toString(),
                 method: "DELETE",
@@ -60,7 +95,7 @@
         }
 
         function postNode() {
-            const word = $("form div input").val();
+            const word = $("form div div input").val();
             $.ajax({
                 url: "/keyword/" + word,
                 method: "POST",

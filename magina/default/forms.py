@@ -21,4 +21,4 @@ class SignupForm(FlaskForm):
 
 class KeywordForm(FlaskForm):
     keyword = StringField('', validators=[DataRequired()])
-    submit = SubmitField('Add new keyword')
+    submit = SubmitField('Add')

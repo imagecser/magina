@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="container" style="background-color: #fcfcfc; padding-top: 20px; padding-bottom: 20px;">
+        <div class="offset-2 col-8 my-3">
+            <h3 style="padding-bottom: 24px;">
+                {% block title %}
+                    Active
+                {% endblock %}
+            </h3>
+            <div class="dropdown-divider"></div>
+            {% include 'flash_message.html' %}
+            <div class="dropdown-divider" style="margin-top: 16px"></div>
+            <a href="{{ url_for('default.login') }}" class="btn btn-outline-success btn-sm" role="button">Login</a>
+
+        </div>
+    </div>
+{% endblock %}
