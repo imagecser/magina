@@ -4,7 +4,7 @@
 
 ![](document/img/send.jpg)
 
-![](document/img/activate email.jpg)
+![](document/img/activate_email.jpg)
 
 ![](document/img/activate.jpg)
 
