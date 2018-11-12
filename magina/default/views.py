@@ -7,10 +7,15 @@ from flask import render_template, request, current_app, redirect, flash, url_fo
 from flask_login import login_required, login_user, current_user, logout_user
 from flask_mail import Message
 
+from magina import mail
+from magina.models import User, EmailActive
 from . import blueprint
 from .forms import LoginForm, SignupForm, KeywordForm
-from .. import mail, db
-from ..models import User, EmailActive
+
+
+@blueprint.route('/test/')
+def test():
+    return ""
 
 
 def anonymous_required(func):
@@ -77,23 +82,23 @@ def signup():
         current_app.logger.info('signup: %s %s %s' % (email, username, password))
         if User.query.filter_by(email=email).first() is None:
             # noinspection PyArgumentList
-            user = User(email=email, username=username, password=password)
-            db.session.add(user)
-            db.session.flush()
-            user_id = user.id
-            active_code = ''.join(random.choices(string.ascii_letters + string.digits, k=24))
-            email_active = EmailActive(user_id=user_id, is_active=False,
-                                       active_code=active_code)
-            db.session.add(email_active)
-            db.session.commit()
+            user_id = User.save_user(User(email=email, username=username, password=password))
+            active_code = ''.join(random.sample(string.ascii_letters + string.digits, k=24))
+            User.save_email_active(EmailActive(user_id=user_id, is_active=False, active_code=active_code))
             message = Message(
-                subject='Activate Your E-mail#%s' % ''.join(random.choices(string.ascii_letters, k=3)),
-                body='Your activate link: %s' % '%s%s?id=%s&code=%s' % (
+                subject='Activate Your E-mail#%s' % ''.join(random.sample(string.ascii_letters, k=3)),
+                body='Your activate link: %s%s?id=%s&code=%s' % (
                     current_app.config['SERVER_DOMAIN_NAME'], url_for('default.activate'), user_id, active_code),
                 recipients=[email]
             )
-            mail.send(message=message)
-            on_active = True
+            # noinspection PyBroadException
+            try:
+                mail.send(message=message)
+                on_active = True
+            except Exception:
+                User.delete_user(user_id)
+                flash('Send verification email failed.')
+                pass
         else:
             flash('E-mail has been registered.')
     return render_template('signup.html', signup_form=signup_form, on_active=on_active)
@@ -121,18 +126,23 @@ def activate():
     if user_id is None or active_code is None:
         flash('Invalid url.')
     else:
-        email_active_row: EmailActive = EmailActive.query.filter_by(user_id=user_id, active_code=active_code).first()
+        email_active_row = EmailActive.query.filter_by(user_id=user_id, active_code=active_code).first()
         if email_active_row is None:
             flash('Url not matches.')
         elif email_active_row.is_active:
             flash('Account has been activated before.')
         else:
-            email_active_row.is_active = True
+            email_active_row.set_active(True)
             email_active_row.user.save_keyword('通知')
-            db.session.commit()
             flash('You have active your account: %s' % email_active_row.user.email)
 
     return render_template('active.html')
+
+
+@blueprint.route('/password/')
+@anonymous_required
+def set_password():
+    pass
 
 
 @blueprint.route('/logout/')

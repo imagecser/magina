@@ -1,8 +1,8 @@
 from flask import Flask
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager
-from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail
+from flask_sqlalchemy import SQLAlchemy
 
 from config import config
 
@@ -10,11 +10,10 @@ mail = Mail()
 db = SQLAlchemy()
 bootstrap = Bootstrap()
 login_manager = LoginManager()
+app = Flask(__name__)
 
 
 def create_app(config_name: str):
-    app = Flask(__name__)
-
     # configuration
     app.jinja_env.auto_reload = True
     app.config.from_object(config[config_name])
@@ -32,4 +31,5 @@ def create_app(config_name: str):
     from .default import blueprint
     app.register_blueprint(blueprint)
 
-    return app
+    from .scrawler import scheduler
+    scheduler.start()
