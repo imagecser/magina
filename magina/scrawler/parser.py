@@ -57,14 +57,13 @@ def get_tuanwei():
                 info_insert = TuanweiInfo(title=title[index_of_url], url=latest_url[index_of_url], class_=1)
                 db.session.add(info_insert)
                 db.session.commit()
-                time.sleep(1)
 
         # 对比新获得的url和已有的
 
         if num is 0:
-            current_app.logger.info('团委公告尚未更新')
+            current_app.logger.info('Youth League not updated')
         else:
-            current_app.logger.info('团委已更新' + str(num) + '条公告')
+            current_app.logger.info('Youth League updated %d notifications' % num)
 
     return messages
 
@@ -125,13 +124,7 @@ def get_jiaowu():
                 info_insert = JiaowuInfo(title=title_top[index_of_url], url=latest_url_top[index_of_url], class_=1)
                 db.session.add(info_insert)
                 db.session.commit()
-                time.sleep(1)
         # 对比新获得的url和已有的
-
-        if num_top is 0:
-            current_app.logger.info('教务置顶公告尚未更新')
-        else:
-            current_app.logger.info('教务已更新' + str(num_top) + '条置顶公告')
 
         # 第三部分：获取非置顶通知
         latest_url_not_top = []
@@ -169,12 +162,11 @@ def get_jiaowu():
                                          url=latest_url_not_top[index_of_url], class_=0)
                 db.session.add(info_insert)
                 db.session.commit()
-                time.sleep(1)
         # 对比新获得的url和已有的
 
-        if num_not_top is 0:
-            current_app.logger.info('教务非置顶公告尚未更新')
+        if num_top + num_not_top is 0:
+            current_app.logger.info('Academic Affairs not updated')
         else:
-            current_app.logger.info('教务已更新' + str(num_not_top) + '条非置顶公告')
+            current_app.logger.info('Academic Affairs updated %d notifications' % num_top + num_not_top)
 
     return messages

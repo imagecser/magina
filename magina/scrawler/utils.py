@@ -1,7 +1,9 @@
 # coding=utf-8
 """The module used to send mail."""
 
+import random
 import re
+import string
 import time
 
 import requests
@@ -71,11 +73,11 @@ def get_page(website):
 
 def get_message(messages, rec):
     return Message(
-        subject='南大通知更新: %s 等' % messages[0]['title'],
-        html="""<html><head></head><body>
+        subject='南大通知: %s 等%s' % (messages[0]['title'], ''.join(random.sample(string.ascii_letters, k=4))),
+        html="""<html><body>
         您好, 您关注的南京大学通知信息更新了!
         %s
-        <br><p>--来自Nova.Studio,若有任何想法或建议，请联系我们:sme@nju.edu.cn ^_^</p>
+        <br><p>若有任何想法或建议，请联系我们:zhi.suun@gmail.com ^_^</p>
         </body></html>""" % (
             ''.join(['<p><a href="%s">%s</a></p>' % (item['url'], item['title']) for item in messages])),
         recipients=[rec]

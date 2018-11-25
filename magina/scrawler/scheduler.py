@@ -6,6 +6,28 @@ from magina import app, mail
 from magina.scrawler import parser, matcher
 from magina.scrawler.utils import get_message
 
+times = 0
+
+
+def func():
+    global times
+    msgs = parser.get_tuanwei() + parser.get_jiaowu()
+    mail_msgs_map = {}
+    for msg in msgs:
+        emails = matcher.matched_emails(msg['title'])
+        for email in emails:
+            if mail_msgs_map.get(email) is None:
+                mail_msgs_map[email] = [msg]
+            else:
+                mail_msgs_map[email].append(msg)
+
+    for email, msgs in mail_msgs_map.items():
+        message = get_message(msgs, email)
+        mail.send(message)
+
+    times += 1
+    current_app.logger.info("scheduler %d times" % times)
+
 
 class Scheduler:
     def __init__(self, _timer, _function):
@@ -30,29 +52,6 @@ class Scheduler:
         if self.task is not None:
             self.task.cancel()
             self.task = None
-
-
-times = 0
-
-
-def func():
-    global times
-    msgs = parser.get_tuanwei() + parser.get_jiaowu()
-    mail_msgs_map = {}
-    for msg in msgs:
-        emails = matcher.matched_emails(msg['title'])
-        for email in emails:
-            if mail_msgs_map.get(email) is None:
-                mail_msgs_map[email] = [msg]
-            else:
-                mail_msgs_map[email].append(msg)
-
-    for email, msgs in mail_msgs_map.items():
-        message = get_message(msgs, email)
-        mail.send(message)
-
-    times += 1
-    current_app.logger.info("running %d" % times)
 
 
 app.app_context().push()
