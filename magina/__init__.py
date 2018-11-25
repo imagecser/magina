@@ -24,7 +24,6 @@ def create_app(config_name: str):
     bootstrap.init_app(app)
     login_manager.init_app(app)
     login_manager.login_view = 'default.login'
-
     from . import models
     db.create_all(app=app)
 
@@ -32,4 +31,4 @@ def create_app(config_name: str):
     app.register_blueprint(blueprint)
 
     from .scrawler import scheduler
-    scheduler.start()
+    # scheduler.start()

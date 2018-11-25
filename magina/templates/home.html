@@ -69,6 +69,16 @@
                     </div>
                 {%- endfor %}
             </div>
+            <div class="dropdown-divider" style="margin-top: 32px; margin-bottom: 16px"></div>
+            <h3>
+                Recent Notifications
+            </h3>
+            <div class="list-group">
+                {% for msg in msgs %}
+                    <a class="list-group-item list-group-item-action {{ loop.cycle("list-group-item-dark", "") }}"
+                       href={{ msg.url }}>{{ msg.title }}</a>
+                {% endfor %}
+            </div>
         </div>
     </div>
 {% endblock %}

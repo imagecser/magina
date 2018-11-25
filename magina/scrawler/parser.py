@@ -10,7 +10,6 @@ def get_tuanwei():
     """
     main part of module tuanwei.
     """
-    app.app_context().push()
     tuanwei_error_warning = 0
     messages = []
     website_tuanwei = "https://tuanwei.nju.edu.cn/component/tags/tag/21"
@@ -35,7 +34,7 @@ def get_tuanwei():
         title = []
         length = len(match_list)
         for length_1 in range(0, length):
-            latest_url.append(match_list[length_1][0])
+            latest_url.append('https://tuanwei.nju.edu.cn/article/%s' % match_list[length_1][0])
             title.append(match_list[length_1][1])
         # 从match_list中分离出url和title
 
@@ -46,8 +45,7 @@ def get_tuanwei():
             if url not in url_before:
                 num += 1
                 index_of_url = latest_url.index(url)
-                website_url = 'https://tuanwei.nju.edu.cn/article/' \
-                              + latest_url[index_of_url]
+                website_url = latest_url[index_of_url]
                 messages.append({
                     'url': website_url,
                     'title': title[index_of_url]
@@ -63,8 +61,7 @@ def get_tuanwei():
         if num is 0:
             current_app.logger.info('Youth League not updated')
         else:
-            current_app.logger.info('Youth League updated %d notifications' % num)
-
+            current_app.logger.info('Youth League updated %s notifications' % str(num))
     return messages
 
 
@@ -72,7 +69,6 @@ def get_jiaowu():
     """
     main part of module jiaowu.
     """
-    app.app_context().push()
     jiaowu_error_warning = 0
     messages = []
     website_jiaowu = "http://jw.nju.edu.cn/allContentList.aspx?MType=PX-WZSY-ZXTZ"
@@ -102,7 +98,7 @@ def get_jiaowu():
         title_top = []
         length = len(match_list_top)
         for length_variable in range(0, length):
-            latest_url_top.append(match_list_top[length_variable][0])
+            latest_url_top.append('http://jw.nju.edu.cn/%s' % match_list_top[length_variable][0])
             title_top.append(match_list_top[length_variable][1])
         # 从match_list中分离出url和title
 
@@ -113,7 +109,7 @@ def get_jiaowu():
             if url not in url_before_top:
                 num_top += 1
                 index_of_url = latest_url_top.index(url)
-                web_url = 'http://jw.nju.edu.cn/' + latest_url_top[index_of_url]
+                web_url = latest_url_top[index_of_url]
                 messages.append({
                     'url': web_url,
                     'title': title_top[index_of_url]
@@ -138,7 +134,8 @@ def get_jiaowu():
                 i += 1
         length = len(match_list_not_top)
         for length_variable in range(0, length):
-            latest_url_not_top.append(match_list_not_top[length_variable][0])
+            latest_url_not_top.append('http://jw.nju.edu.cn/ContentList.aspx?mtype=PX-WZSY-ZXTZ&FType=WZSY&%s' %
+                                      match_list_not_top[length_variable][0])
             title_not_top.append(match_list_not_top[length_variable][1])
         # 从match_list中分离出url和title
 
@@ -149,8 +146,7 @@ def get_jiaowu():
             if url not in url_before_not_top:
                 num_not_top += 1
                 index_of_url = latest_url_not_top.index(url)
-                web_url = 'http://jw.nju.edu.cn/ContentList.aspx?mtype=PX-WZSY-ZXTZ&FType=WZSY&' \
-                          + latest_url_not_top[index_of_url]
+                web_url = latest_url_not_top[index_of_url]
                 messages.append({
                     'url': web_url,
                     'title': title_not_top[index_of_url]
@@ -167,6 +163,5 @@ def get_jiaowu():
         if num_top + num_not_top is 0:
             current_app.logger.info('Academic Affairs not updated')
         else:
-            current_app.logger.info('Academic Affairs updated %d notifications' % num_top + num_not_top)
-
+            current_app.logger.info('Academic Affairs updated %s notifications' % str(num_top + num_not_top))
     return messages

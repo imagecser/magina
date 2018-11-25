@@ -11,6 +11,7 @@ from magina import mail
 from magina.models import User, EmailActive
 from . import blueprint
 from .forms import LoginForm, SignupForm, KeywordForm
+from magina.models import TuanweiInfo, JiaowuInfo
 
 
 @blueprint.route('/test/')
@@ -35,15 +36,19 @@ def anonymous_required(func):
 def index():
     keyword_form = KeywordForm()
     words_to_show = [keyword.word for keyword in current_user.keywords]
+    tw_rows = TuanweiInfo.query.order_by(TuanweiInfo.id.desc()).limit(5).all()
+    jw_rows = JiaowuInfo.query.filter_by(class_=1).order_by(JiaowuInfo.id.desc()).limit(5).all() + \
+        JiaowuInfo.query.filter_by(class_=0).order_by(JiaowuInfo.id.desc()).limit(5).all()
+    msgs = [{'url': item.url, 'title': item.title} for item in tw_rows]
+    msgs += [{'url': item.url, 'title': item.title} for item in jw_rows]
     if keyword_form.validate_on_submit():
         _keyword = keyword_form.keyword.data
         if _keyword in words_to_show:
             flash('You have added the keyword before.')
         else:
             current_user.save_keyword(_keyword)
-
     return render_template('home.html', is_login=True, keyword_form=keyword_form,
-                           enumerate_words=enumerate(words_to_show))
+                           enumerate_words=enumerate(words_to_show), msgs=msgs)
 
 
 @blueprint.route('/login/', methods=['GET', 'POST'])

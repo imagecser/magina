@@ -11,6 +11,8 @@ times = 0
 
 def func():
     global times
+    context = app.app_context()
+    context.push()
     msgs = parser.get_tuanwei() + parser.get_jiaowu()
     mail_msgs_map = {}
     for msg in msgs:
@@ -24,9 +26,9 @@ def func():
     for email, msgs in mail_msgs_map.items():
         message = get_message(msgs, email)
         mail.send(message)
-
     times += 1
     current_app.logger.info("scheduler %d times" % times)
+    context.pop()
 
 
 class Scheduler:
@@ -54,5 +56,7 @@ class Scheduler:
             self.task = None
 
 
-app.app_context().push()
+_ctx = app.app_context()
+_ctx.push()
 scheduler = Scheduler(current_app.config['SCHEDULER_TIMER'], func)
+_ctx.pop()
