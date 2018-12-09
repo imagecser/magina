@@ -17,7 +17,7 @@ def get_tuanwei():
     text_re = "<h3>\n\t\t\t\t\t<a href=\"/article/(.*)\">\n\t\t\t\t\t\t(.*)\t\t\t\t\t</a>\n\t\t\t\t</h3>"
 
     if crawler_tuanwei[1] is 'wrong':
-        current_app.logger.warning('error: cant connect to tuanwei.')
+        current_app.logger.warning('cant connect to tuanwei.')
         tuanwei_error_warning += 1
         send_update_mail(current_app.config['MAIL_USERNAME'],
                          '团委',
@@ -77,7 +77,7 @@ def get_jiaowu():
     text_re_not_top = "<a href='(.*?)'>(.*?)</a><span class='time_l'>"
 
     if crawler_jiaowu[1] is 'wrong':
-        current_app.logger.warning('error: cant connect to jiaowu.')
+        current_app.logger.warning('cant connect to jiaowu.')
         jiaowu_error_warning += 1
         send_update_mail(current_app.config['MAIL_USERNAME'],
                          '教务',

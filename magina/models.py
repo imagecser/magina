@@ -39,6 +39,10 @@ class User(UserMixin, db.Model):
 
     @staticmethod
     def delete_user(user_id):
+        email_active = EmailActive.query.filter_by(user_id=user_id).first()
+        if email_active is not None:
+            db.session.delete(email_active)
+            db.session.commit()
         user = User.query.filter_by(id=user_id).first()
         if user is not None:
             db.session.delete(user)
@@ -63,9 +67,9 @@ class User(UserMixin, db.Model):
 
     def save_keyword(self, word_to_save):
         keyword_in_table = Keyword.query.filter_by(word=word_to_save).first()
+        if word_to_save in [keyword.word for keyword in self.keywords]:
+            return False
         if keyword_in_table is None:
-            if word_to_save in [keyword.word for keyword in self.keywords]:
-                return False
             keyword_in_table = Keyword(word=word_to_save)
             db.session.add(keyword_in_table)
         self.keywords.append(keyword_in_table)

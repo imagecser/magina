@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
 {% import 'bootstrap/wtf.html' as wtf %}
+{% block title %}
+    Home
+{% endblock %}
 {% block styles %}
     {{ super() }}
     <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}"/>
@@ -8,10 +11,17 @@
     <div class="container" style="background-color: #fcfcfc; padding-top: 20px; padding-bottom: 20px;">
         <div class="offset-1 col-10 my-1">
             <h3>
-                {% block title %}
-                    Keyword
-                {% endblock %}
+                Keyword
             </h3>
+            <div class="input-group" style="padding-top: 32px">
+                <div class="my-2">
+                    {% for word in candidates %}
+                        <a class="candidate-word badge badge-pill label-badge {{ [
+                    'badge-primary', 'badge-secondary', 'badge-success', 'badge-danger', 'badge-warning',
+                     'badge-info'] | random }}" onclick="postNode(this)">{{ word }}</a>
+                    {% endfor %}
+                </div>
+            </div>
             {% include 'flash_message.html' %}
             {% for field, errors in keyword_form.errors.items() %}
                 {% for error in errors %}
@@ -25,7 +35,7 @@
             {#                {{ wtf.quick_form(keyword_form) }}#}
             <div class="row justify-content-center">
                 <div class="col-12 col-md-10 col-lg-12">
-                    <form action="javascript:postNode()">
+                    <form action="javascript:postInput()">
                         <div class="card-body row no-gutters align-items-center">
                             {{ keyword_form.hidden_tag() }}
                             <div class="col">
@@ -59,7 +69,7 @@
                     </div>
                 </div>
             </div>
-            <div class="input-group" style="padding-top: 32px">
+            <div class="input-group candidate" style="padding-top: 32px">
                 {% for idx, word in enumerate_words -%}
                     <div class="my-2">
                     <span class="badge badge-pill label-badge {{ [
@@ -104,23 +114,33 @@
             });
         }
 
-        function postNode() {
-            const word = $("form div div input").val();
+        function _post(word) {
             $.ajax({
                 url: "/keyword/" + word,
                 method: "POST",
                 success: function (data) {
                     if (data === "err") {
                     } else {
-                        let $node = $(".input-group div:eq(0)").clone(true);
+                        let $node = $(".candidate div:eq(0)").clone(true);
                         $node.children('span').removeClass(function () {
                             return $(this).attr("class");
                         }).addClass("badge badge-pill label-badge").addClass(badgeStyle[Math.floor(Math.random() * badgeStyle.length)]);
-                        $(".input-group").append($node);
+                        $(".candidate").append($node);
                         $node.children('span').text(word);
                     }
                 }
             })
+        }
+
+        function postInput() {
+            const word = $("form div div input").val();
+            _post(word);
+        }
+
+        function postNode(node) {
+            const word = $(node).text().toString();
+            console.log(word);
+            _post(word);
         }
     </script>
 {% endblock %}

@@ -1,7 +1,6 @@
 from threading import Timer
 
 from flask import current_app
-
 from magina import app, mail
 from magina.scrawler import parser, matcher
 from magina.scrawler.utils import get_message
@@ -12,11 +11,14 @@ times = 0
 def func():
     global times
     context = app.app_context()
+    # from flask_mail import Message
+    # mail.send(Message(subject='ok', recipients=['imagecser@gmail.com'], body='body'))
     context.push()
     msgs = parser.get_tuanwei() + parser.get_jiaowu()
     mail_msgs_map = {}
     for msg in msgs:
         emails = matcher.matched_emails(msg['title'])
+        # emails = ['imagecser@gmail.com']
         for email in emails:
             if mail_msgs_map.get(email) is None:
                 mail_msgs_map[email] = [msg]

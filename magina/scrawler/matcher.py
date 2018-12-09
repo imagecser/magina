@@ -10,6 +10,10 @@ def hanlp_parse(sentence, keywords):
     """
     hanlp test
     """
+
+    if not isThreadAttachedToJVM():
+        attachThreadToJVM()
+
     id_scorer = JClass('com.hankcs.hanlp.suggest.scorer.lexeme.IdVectorScorer')()
     id_scorer.addSentence(sentence)
     scores = {}
@@ -25,8 +29,11 @@ def hanlp_parse(sentence, keywords):
     return [item[0] for item in scores.items() if item[1] > 0.5]
 
 
+if __name__ == '__main__':
+    print(hanlp_parse('什么', ['']))
+
+
 def matched_emails(topic: str) -> list:
-    app.app_context().push()
     emails = []
     keywords = [item for item in Keyword.query.all()]
     for keyword in hanlp_parse(topic, keywords):
@@ -35,7 +42,3 @@ def matched_emails(topic: str) -> list:
     #     if is_keyword_match(topic, keyword.word):
     #         emails += [user.email for user in keyword.users]
     return emails
-
-
-if __name__ == '__main__':
-    print(hanlp_parse("你好, 我是孙治", ['你好', '狗']))

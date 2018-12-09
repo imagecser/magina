@@ -5,6 +5,7 @@ from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
 
 from config import config
+import logging
 
 mail = Mail()
 db = SQLAlchemy()
@@ -24,6 +25,7 @@ def create_app(config_name: str):
     bootstrap.init_app(app)
     login_manager.init_app(app)
     login_manager.login_view = 'default.login'
+    app.logger.setLevel(logging.DEBUG)
     from . import models
     db.create_all(app=app)
 
@@ -31,4 +33,4 @@ def create_app(config_name: str):
     app.register_blueprint(blueprint)
 
     from .scrawler import scheduler
-    # scheduler.start()
+    scheduler.start()

@@ -60,10 +60,10 @@ def get_page(website):
 
     # noinspection PyBroadException
     try:
-        pages = requests.get(website, timeout=5).text
+        pages = requests.get(website, timeout=30).text
     except Exception:
         connection_status = 'wrong'
-        current_app.logger.warning('connection error:cannot connect to %s!' % website)
+        current_app.logger.warning('cannot connect to %s!' % website)
         localtime = time.asctime(time.localtime(time.time()))
         print(connection_status + ' ' + website)
         print('time: ' + localtime)
@@ -73,7 +73,7 @@ def get_page(website):
 
 def get_message(messages, rec):
     return Message(
-        subject='南大通知: %s 等%s' % (messages[0]['title'], ''.join(random.sample(string.ascii_letters, k=4))),
+        subject='%s 等%s' % (messages[0]['title'], ''.join(random.sample(string.ascii_letters, k=4))),
         html="""<html><body>
         您好, 您关注的南京大学通知信息更新了!
         %s
