@@ -27,7 +27,11 @@ def func():
 
     for email, msgs in mail_msgs_map.items():
         message = get_message(msgs, email)
-        mail.send(message)
+        try:
+            print(message)
+            mail.send(message)
+        except Exception:
+            current_app.logger.info("Send mail failed")
     times += 1
     current_app.logger.info("scheduler %d times" % times)
     context.pop()

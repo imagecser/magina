@@ -27,12 +27,12 @@
                 <div class="collapse navbar-collapse" id="baseNavbar">
                     <ul class="navbar-nav mr-auto"></ul>
                     <ul class="navbar-nav ml-auto">
-                        <li class="nav-item">
-                            <a class="nav-link align-items-center" href="#">
-                                <img src="{{ url_for('static', filename='img/cog.svg') }}" width="16" height="16"/>
-                                Profile
-                            </a>
-                        </li>
+{#                        <li class="nav-item">#}
+{#                            <a class="nav-link align-items-center" href="#">#}
+{#                                <img src="{{ url_for('static', filename='img/cog.svg') }}" width="16" height="16"/>#}
+{#                                Profile#}
+{#                            </a>#}
+{#                        </li>#}
                         <li class="nav-item">
                             <a class="nav-link align-items-center" href="{{ url_for('default.logout') }}">
                                 <img src="{{ url_for('static', filename='img/account-logout.svg') }}" width="16"
@@ -53,6 +53,6 @@
     </div>
     <!-- Copyright -->
     <script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
-    <script src="//cdn.bootcss.com/popper.js/1.14.3/esm/popper.min.js"></script>
+    <script src="//cdn.bootcss.com/popper.js/1.14.3/umd/popper.js"></script>
     <script src="//cdn.bootcss.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 {% endblock %}

@@ -10,10 +10,11 @@
 {% block content %}
     <div class="container" style="background-color: #fcfcfc; padding-top: 20px; padding-bottom: 20px;">
         <div class="offset-1 col-10 my-1">
+            <div class="dropdown-divider"></div>
             <h3>
-                Keyword
+                Recommended Keywords
             </h3>
-            <div class="input-group" style="padding-top: 32px">
+            <div class="input-group" style="padding-top: 16px">
                 <div class="my-2">
                     {% for word in candidates %}
                         <a class="candidate-word badge badge-pill label-badge {{ [
@@ -33,6 +34,9 @@
             {% endfor %}
             <div class="dropdown-divider"></div>
             {#                {{ wtf.quick_form(keyword_form) }}#}
+            <h3 style="padding-top: 16px">
+                Select Your Keywords
+            </h3>
             <div class="row justify-content-center">
                 <div class="col-12 col-md-10 col-lg-12">
                     <form action="javascript:postInput()">
@@ -69,7 +73,7 @@
                     </div>
                 </div>
             </div>
-            <div class="input-group candidate" style="padding-top: 32px">
+            <div class="input-group candidate" style="padding-top: 8px">
                 {% for idx, word in enumerate_words -%}
                     <div class="my-2">
                     <span class="badge badge-pill label-badge {{ [
